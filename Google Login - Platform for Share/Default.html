@@ -1,0 +1,157 @@
+<html>
+<head>
+</head>
+<body onload="loadGoogle();">
+<iframe id="frmGoogleKey" src="GoogleKey.txt" onload="loadKeyFile();" style="display: none;"></iframe>
+<div id="my-signin2"></div>
+<pre id="output"></pre> <!-- Preformatted text tag populated with contact details. -->
+<button id="logout-button" onclick="logoutGoogleAPI()" style="visibility: hidden">Logout</button>
+<p id="logged-out" style="visibility: hidden">Logged out.</p>
+
+<script>
+
+// http://localhost:xx/
+
+// Global variables.
+
+// The Client ID can be retrieved from the project in the Google
+// Developer Console, https://console.developers.google.com
+var g_strClientID = '.apps.googleusercontent.com'; // Add rest of key through function.  Place contents of first portion of key in file.
+
+function loadKeyFile()
+
+	{
+	// Recommend obfuscating this and any encryption procedures.
+		
+	// The function fetches and returns the important portion of the Google client client.
+	// Decryption occurs after reading the key file.
+		
+	var oFrame; // Reference to iFrame containing contents of text file with Google client key.
+	var strDecryptedKey; // Decrypted Google client key.
+	var strRawContents; // Text file contents.
+	
+	// Get reference to iFrame containing contents of text file with Google client key.
+	oFrame = document.getElementById("frmGoogleKey");
+	
+	// Get contents of text file with Google client key.
+	strRawContents = oFrame.contentWindow.document.body.childNodes[0].innerHTML;
+	
+	// Add decryption process here (assuming file contains encrypted key).
+	//strDecryptedKey = decryptText(strRawContents);
+	
+	// Build full Google client key.
+	//return strDecryptedKey + g_strClientID;
+	return strRawContents + g_strClientID;
+	}
+
+function loadGoogle()
+
+	{
+	// The procedure loads the Google API.
+	// Loading the API dynamically allows for securely loading client key.
+	
+	var objMeta; // Reference to DOM object with meta tag with Google sign-in.
+	var objScript; // Reference to DOM object with Google API script.
+	
+	// Add meta tag for Google sign-in.
+	var objMeta = document.createElement('meta');
+	objMeta.httpEquiv = "X-UA-Compatible";
+	objMeta.name = "google-signin-client_id";
+	objMeta.content = loadKeyFile();
+	document.getElementsByTagName('head')[0].appendChild(objMeta);
+	
+	// Add script loading Google API.
+	var objScript = document.createElement("script");
+	objScript.type = "text/javascript";
+	objScript.src = "https://apis.google.com/js/platform.js?onload=renderButton";
+	objScript.defer = true;
+	document.getElementsByTagName('head')[0].appendChild(objScript);
+	}
+
+// objGoogleUser = Reference to currently logged in Google user.
+function onSuccess(objGoogleUser)
+
+	{
+	// The procedure occurs after the user logs successfully into Google or if the website refreshes for an already authenticated session.
+	
+	// Hide the div element containing the login picture.
+	document.getElementById("my-signin2").style.visibility = "hidden";
+	
+	// Display button allowing for logging out of Google API.
+	document.getElementById("logout-button").style.visibility = "visible";
+	
+	// Show a messagebox to the user with his / her display name.
+	alert('Logged in as: ' + objGoogleUser.getBasicProfile().getName());
+	}
+		
+// objError = Object containing error details.
+function onFailure(objError) 
+
+	{
+	// The procedure occurs after an error occurs when the user attempts to log into Google.
+	
+	// Hide the div element containing the login picture.
+	document.getElementById("my-signin2").style.visibility = "hidden";
+	
+	// Show a messagebox to the user with the error description.
+	alert("Failure:  " + objError);
+	}
+
+function renderButton()
+
+	{
+	// The procedure displays the login button to authenticate with Google.
+	gapi.signin2.render('my-signin2', // Div in which to display button.
+		{
+        //'scope': 'profile email',
+		'scope':  ["https://www.googleapis.com/auth/contacts.readonly"].join(' '),
+        'width': 240,
+        'height': 50,
+        'longtitle': true,
+        'theme': 'dark',
+        'onsuccess': onSuccess,
+        'onfailure': onFailure
+		});
+    }
+	
+function logoutGoogleAPI()
+
+	{
+	// The procedure creates and uses a hidden iframe to log out of Google.
+		
+	var obj_iFrame; // Reference to iframe to use to log out of Google.
+	var strHTML; // HTML to use within iframe.
+	
+	// Create iframe element.
+	obj_iFrame = document.createElement('iframe');
+	
+	// Store text to use as HTML within iframe.
+	strHTML = String.fromCharCode(60) + "script type=" + String.fromCharCode(34) + "text/javascript" + String.fromCharCode(34) + " src=" + String.fromCharCode(34) + 
+	"https://accounts.google.com/logout" + String.fromCharCode(34) + "><" + String.fromCharCode(47) + "script>";
+	
+	// Set iframe to not appear.
+	obj_iFrame.style.display = "none";
+	
+	// Append iframe to web page.
+	document.body.appendChild(obj_iFrame);
+	
+	// Open the iframe for editing.
+	obj_iFrame.contentWindow.document.open();
+	
+	// Write the contents of the iframe.
+	obj_iFrame.contentWindow.document.write(strHTML);
+	
+	// Close the reference to the iframe.
+	obj_iFrame.contentWindow.document.close();
+	
+	// Hide button allowing for logging out of Google API.
+	document.getElementById("logout-button").style.visibility = "hidden";
+	
+	// Show paragraph indicating the logout occurred.
+	document.getElementById("logged-out").style.visibility = "visible";
+	}
+	
+</script>
+
+</body>
+</html>

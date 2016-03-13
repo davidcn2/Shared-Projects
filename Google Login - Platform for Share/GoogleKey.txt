@@ -1,0 +1,2 @@
+Insert the portion of the Google API client key before before .apps.googleusercontent.com.
+Example:  If clienty key is 123456789-ABCDEFGH.apps.googleusercontent.com, the file should contain only 123456789-ABCDEFGH
